@@ -1,0 +1,41 @@
+.layout {
+  display: flex;
+}
+
+.main {
+  flex: 1;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+.content {
+  padding: 25px;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.course-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+}
+
+.course-header {
+  height: 100px;
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+}
+
+.course-body {
+  padding: 15px;
+}

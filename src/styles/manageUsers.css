@@ -1,0 +1,27 @@
+.manage-users {
+  padding: 20px;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.user-table th {
+  background: #1976d2;
+  color: white;
+  padding: 12px;
+}
+
+.user-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.user-table select {
+  padding: 8px;
+  border-radius: 8px;
+}
