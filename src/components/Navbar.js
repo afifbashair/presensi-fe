@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import API from "../services/api";
 
@@ -14,7 +19,8 @@ import {
 
 export default function Navbar() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   const user =
     JSON.parse(
@@ -26,8 +32,12 @@ export default function Navbar() {
   // =========================
 
   const isAdmin =
-    user?.roles?.includes("admin") ||
-    user?.roles?.includes("teacher");
+    user?.roles?.includes(
+      "admin"
+    ) ||
+    user?.roles?.includes(
+      "teacher"
+    );
 
   // =========================
   // NOTIFICATION
@@ -38,25 +48,56 @@ export default function Navbar() {
     setNotifications,
   ] = useState([]);
 
-  useEffect(() => {
+  const [
+    showNotif,
+    setShowNotif,
+  ] = useState(false);
 
-    API.get("/notifications")
-      .then((res) => {
+  const fetchNotif =
+    async () => {
+
+      try {
+
+        const res =
+          await API.get(
+            "/notifications"
+          );
 
         setNotifications(
           res.data
         );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
 
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+  useEffect(() => {
+    fetchNotif();
   }, []);
+
+  // =========================
+  // UNREAD COUNT
+  // =========================
 
   const unread =
     notifications.filter(
       (n) => !n.is_read
     ).length;
+
+  // =========================
+  // READ
+  // =========================
+
+  const markAsRead =
+    async (id) => {
+
+      await API.put(
+        `/notifications/${id}/read`
+      );
+
+      fetchNotif();
+    };
 
   // =========================
   // LOGOUT
@@ -82,20 +123,20 @@ export default function Navbar() {
       <div className="nav-left">
 
         <button
+          className="dashboard-btn"
           onClick={() =>
             navigate("/")
           }
-          className="dashboard-btn"
         >
           Dashboard
         </button>
 
         {isAdmin && (
           <button
+            className="dashboard-btn"
             onClick={() =>
               navigate("/admin")
             }
-            className="dashboard-btn"
           >
             Admin
           </button>
@@ -104,14 +145,19 @@ export default function Navbar() {
 
       {/* RIGHT */}
       <div className="nav-action">
+
         {/* NOTIFICATION */}
+
           <button
             className="icon-btn"
             onClick={() =>
-              navigate("/notifications")
+              setShowNotif(
+                !showNotif
+              )
             }
           >
             <FiBell />
+
             {unread > 0 && (
               <span className="notif-badge">
                 {unread}
@@ -119,13 +165,75 @@ export default function Navbar() {
             )}
           </button>
 
+          {/* DROPDOWN */}
+          {showNotif && (
+
+            <div className="notif-dropdown">
+
+              <div className="notif-header">
+                Notifications
+              </div>
+
+              {notifications.length === 0 ? (
+
+                <div className="empty-notif">
+                  Tidak ada notifikasi
+                </div>
+
+              ) : (
+
+                notifications
+                  .slice(0, 5)
+                  .map((n) => (
+
+                    <div
+                      key={n.id}
+
+                      className={`notif-item ${
+                        !n.is_read
+                          ? "unread"
+                          : ""
+                      }`}
+
+                      onClick={() =>
+                        markAsRead(
+                          n.id
+                        )
+                      }
+                    >
+
+                      <h4>
+                        {n.title}
+                      </h4>
+
+                      <p>
+                        {n.message}
+                      </p>
+
+                    </div>
+                  ))
+              )}
+
+              <button
+                className="see-all-btn"
+                onClick={() =>
+                  navigate(
+                    "/notifications"
+                  )
+                }
+              >
+                Lihat Semua
+              </button>
+
+            </div>
+          )}
+
         {/* PROFILE */}
         <button
           onClick={() =>
             navigate("/profile")
           }
           className="icon-btn"
-          title="Profile"
         >
           <FiUser />
         </button>
