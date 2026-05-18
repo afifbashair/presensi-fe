@@ -1,47 +1,143 @@
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
+import API from "../services/api";
+
 import "../styles/navbar.css";
-import { FiLogOut, FiUser } from "react-icons/fi";
+
+import {
+  FiLogOut,
+  FiUser,
+  FiBell,
+} from "react-icons/fi";
 
 export default function Navbar() {
+
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
+  // =========================
+  // ROLE
+  // =========================
 
   const isAdmin =
     user?.roles?.includes("admin") ||
     user?.roles?.includes("teacher");
 
+  // =========================
+  // NOTIFICATION
+  // =========================
+
+  const [
+    notifications,
+    setNotifications,
+  ] = useState([]);
+
+  useEffect(() => {
+
+    API.get("/notifications")
+      .then((res) => {
+
+        setNotifications(
+          res.data
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+  }, []);
+
+  const unread =
+    notifications.filter(
+      (n) => !n.is_read
+    ).length;
+
+  // =========================
+  // LOGOUT
+  // =========================
+
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user"); // 🔥 jangan lupa
+
+    localStorage.removeItem(
+      "token"
+    );
+
+    localStorage.removeItem(
+      "user"
+    );
+
     navigate("/login");
   };
 
   return (
     <div className="navbar">
-      <button onClick={() => navigate("/")} className="dashboard-btn">
-        Dashboard
-      </button>
 
-      {/* 🔥 ADMIN BUTTON */}
-      {isAdmin && (
-        <button onClick={() => navigate("/admin")} className="dashboard-btn">
-          Admin
-        </button>
-      )}
+      {/* LEFT */}
+      <div className="nav-left">
 
-      <div className="nav-action">
         <button
-          onClick={() => navigate("/profile")}
+          onClick={() =>
+            navigate("/")
+          }
+          className="dashboard-btn"
+        >
+          Dashboard
+        </button>
+
+        {isAdmin && (
+          <button
+            onClick={() =>
+              navigate("/admin")
+            }
+            className="dashboard-btn"
+          >
+            Admin
+          </button>
+        )}
+      </div>
+
+      {/* RIGHT */}
+      <div className="nav-action">
+        {/* NOTIFICATION */}
+          <button
+            className="icon-btn"
+            onClick={() =>
+              navigate("/notifications")
+            }
+          >
+            <FiBell />
+            {unread > 0 && (
+              <span className="notif-badge">
+                {unread}
+              </span>
+            )}
+          </button>
+
+        {/* PROFILE */}
+        <button
+          onClick={() =>
+            navigate("/profile")
+          }
           className="icon-btn"
           title="Profile"
         >
           <FiUser />
         </button>
 
-        <button onClick={logout} className="logout-btn">
+        {/* LOGOUT */}
+        <button
+          onClick={logout}
+          className="logout-btn"
+        >
           <FiLogOut />
         </button>
+
       </div>
     </div>
   );

@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
+
 import API from "../services/api";
 
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-
-import "../styles/manageUsers.css";
+import "../styles/admin.css";
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState([]);
 
+  const [users, setUsers] =
+    useState([]);
+
+  const [form, setForm] =
+    useState({
+      name: "",
+      email: "",
+      password: "",
+      role: "student",
+    });
+
+  // FETCH
   const fetchUsers = async () => {
     try {
-      const res = await API.get("/users");
+      const res =
+        await API.get("/users");
 
       setUsers(res.data);
+
     } catch (err) {
       console.log(err);
     }
@@ -23,86 +34,166 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
-  // 🔥 ASSIGN ROLE
-  const handleRoleChange = async (userId, role) => {
+  // CREATE
+  const handleSubmit = async () => {
     try {
-      await API.post(`/users/${userId}/assign-role`, {
-        role_name: role,
-      });
+      await API.post(
+        "/users",
+        form
+      );
 
-      alert("Role berhasil diubah");
+      alert(
+        "User berhasil dibuat"
+      );
+
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "student",
+      });
 
       fetchUsers();
 
     } catch (err) {
-      alert(err.response?.data?.message);
+      alert(
+        err.response?.data?.message
+      );
     }
   };
 
+  // DELETE
+  const handleDelete = async (
+    id
+  ) => {
+    const confirmDelete =
+      window.confirm(
+        "Hapus user ini?"
+      );
+
+    if (!confirmDelete) return;
+
+    await API.delete(
+      `/users/${id}`
+    );
+
+    fetchUsers();
+  };
+
   return (
-    <div className="layout">
-      <Sidebar />
+    <div className="admin-container">
+      <h2>Kelola User</h2>
 
-      <div className="main">
-        <Navbar />
+      {/* FORM */}
+      <div className="admin-form">
 
-        <div className="manage-users">
-          <h1>Kelola User</h1>
+        <input
+          placeholder="Nama"
+          value={form.name}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              name:
+                e.target.value,
+            })
+          }
+        />
 
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Ubah Role</th>
-              </tr>
-            </thead>
+        <input
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              email:
+                e.target.value,
+            })
+          }
+        />
 
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
+        <input
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              password:
+                e.target.value,
+            })
+          }
+        />
 
-                  <td>{u.email}</td>
+        {/* ROLE */}
+        <select
+          value={form.role}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              role:
+                e.target.value,
+            })
+          }
+        >
+          <option value="student">
+            Student
+          </option>
 
-                  <td>
-                    {u.roles?.map((r) => r.name).join(", ")}
-                  </td>
+          <option value="teacher">
+            Teacher
+          </option>
 
-                  <td>
-                    <select
-                      onChange={(e) =>
-                        handleRoleChange(
-                          u.id,
-                          e.target.value
-                        )
-                      }
-                      defaultValue=""
-                    >
-                      <option value="" disabled>
-                        Pilih Role
-                      </option>
+          <option value="admin">
+            Admin
+          </option>
+        </select>
 
-                      <option value="student">
-                        Student
-                      </option>
-
-                      <option value="teacher">
-                        Teacher
-                      </option>
-
-                      <option value="admin">
-                        Admin
-                      </option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <button onClick={handleSubmit}>
+          Tambah User
+        </button>
       </div>
+
+      {/* TABLE */}
+      <table className="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.id}>
+              <td>{u.id}</td>
+
+              <td>{u.name}</td>
+
+              <td>{u.email}</td>
+
+              <td>
+                {u.roles.join(", ")}
+              </td>
+
+              <td>
+                <button
+                  className="delete-btn"
+                  onClick={() =>
+                    handleDelete(
+                      u.id
+                    )
+                  }
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

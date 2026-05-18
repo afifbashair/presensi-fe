@@ -36,6 +36,10 @@ export default function Sidebar() {
             <li onClick={() => navigate("/admin/users")}>
               Kelola User
             </li>
+
+            <li onClick={() => navigate("/admin/courses")}>
+            Manage Courses
+          </li>
           </>
         )}
       </ul>
