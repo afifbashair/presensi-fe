@@ -2,10 +2,13 @@ runtime: nodejs24
 service: presensi-fe
 
 handlers:
-  - url: /
-    static_files: index.html
-    upload: index.html
+  - url: /static
+    static_dir: build/static
 
-  - url: /(.*)
-    static_files: \1
-    upload: (.*)
+  - url: /(.*\.(json|ico|js|css|png|jpg|svg|txt|woff|woff2))$
+    static_files: build/\1
+    upload: build/(.*)
+
+  - url: /.*
+    static_files: build/index.html
+    upload: build/index.html
