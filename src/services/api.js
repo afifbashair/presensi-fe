@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://presensi-be-276882742884.us-central1.run.app/api",
 });
 
 // 🔐 AUTO INSERT TOKEN
