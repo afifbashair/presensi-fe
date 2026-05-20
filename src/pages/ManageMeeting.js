@@ -516,27 +516,17 @@ export default function ManageMeeting() {
                   </td>
 
                   <td>
-                    {new Date(
-                      m.start_time
-                    ).toLocaleString(
-                      "id-ID",
-                      {
-                        timeZone:
-                          "Asia/Jakarta",
-                      }
-                    )}
+                    {m.start_time
+                      ?.replace("T", " ")
+                      ?.replace(".000Z", "")
+                      ?.slice(0, 16)}
                   </td>
 
                   <td>
-                    {new Date(
-                      m.end_time
-                    ).toLocaleString(
-                      "id-ID",
-                      {
-                        timeZone:
-                          "Asia/Jakarta",
-                      }
-                    )}
+                    {m.end_time
+                      ?.replace("T", " ")
+                      ?.replace(".000Z", "")
+                      ?.slice(0, 16)}
                   </td>
 
                   <td>
