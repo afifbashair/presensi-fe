@@ -3,14 +3,22 @@ import API from "../services/api";
 import "../styles/admin.css";
 
 // FORMAT DATETIME
-const formatDateTimeLocal = (date) => {
-  if (!date) return "";
+const formatLocalDateTime = (dateTime) => {
+  const date = new Date(dateTime);
 
-  const d = new Date(date);
+  const offset =
+    date.getTimezoneOffset();
 
-  d.setHours(d.getHours() + 7);
+  const local =
+    new Date(
+      date.getTime() -
+      offset * 60000
+    );
 
-  return d.toISOString().slice(0, 16);
+  return local
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
 };
 
 export default function ManageMeeting() {
@@ -53,10 +61,34 @@ export default function ManageMeeting() {
   const handleSubmit = async () => {
     try {
       if (editId) {
-        await API.put(
-          `/meetings/${editId}`,
-          form
-        );
+        const payload = {
+          ...form,
+
+          start_time:
+            formatLocalDateTime(
+              form.start_time
+            ),
+
+          end_time:
+            formatLocalDateTime(
+              form.end_time
+            ),
+        };
+
+        if (editId) {
+
+          await API.put(
+            `/meetings/${editId}`,
+            payload
+          );
+
+        } else {
+
+          await API.post(
+            "/meetings",
+            payload
+          );
+        }
 
         alert("Meeting berhasil diupdate");
 
