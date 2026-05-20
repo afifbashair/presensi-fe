@@ -1,10 +1,25 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import API from "../services/api";
+
 import "../styles/admin.css";
 
-// FORMAT DATETIME
-const formatLocalDateTime = (dateTime) => {
-  const date = new Date(dateTime);
+
+// =====================================
+// FORMAT DATETIME FOR DATABASE
+// =====================================
+
+const formatLocalDateTime = (
+  dateTime
+) => {
+
+  if (!dateTime) return "";
+
+  const date =
+    new Date(dateTime);
 
   const offset =
     date.getTimezoneOffset();
@@ -21,47 +36,129 @@ const formatLocalDateTime = (dateTime) => {
     .replace("T", " ");
 };
 
+
+// =====================================
+// FORMAT FOR datetime-local INPUT
+// =====================================
+
+const formatDateTimeLocal = (
+  dateString
+) => {
+
+  if (!dateString) return "";
+
+  const date =
+    new Date(dateString);
+
+  const offset =
+    date.getTimezoneOffset();
+
+  const localDate =
+    new Date(
+      date.getTime() -
+      offset * 60000
+    );
+
+  return localDate
+    .toISOString()
+    .slice(0, 16);
+};
+
+
 export default function ManageMeeting() {
-  const [meetings, setMeetings] = useState([]);
-  const [courses, setCourses] = useState([]);
 
-  const [selectedCourse, setSelectedCourse] =
-    useState("");
+  // =====================================
+  // STATES
+  // =====================================
 
-  const [form, setForm] = useState({
+  const [
+    meetings,
+    setMeetings,
+  ] = useState([]);
+
+  const [
+    courses,
+    setCourses,
+  ] = useState([]);
+
+  const [
+    selectedCourse,
+    setSelectedCourse,
+  ] = useState("");
+
+  const [
+    editId,
+    setEditId,
+  ] = useState(null);
+
+  const [
+    form,
+    setForm,
+  ] = useState({
+
     course_id: "",
+
     title: "",
+
     type: "attendance",
+
     content: "",
+
     start_time: "",
+
     end_time: "",
   });
 
-  const [editId, setEditId] = useState(null);
 
-  // FETCH
-  const fetchData = async () => {
-    try {
-      const meetingRes = await API.get("/meetings");
-      const courseRes = await API.get("/courses");
+  // =====================================
+  // FETCH DATA
+  // =====================================
 
-      setMeetings(meetingRes.data);
-      setCourses(courseRes.data);
+  const fetchData =
+    async () => {
 
-    } catch (err) {
-      console.log(err);
-    }
-  };
+      try {
+
+        const meetingRes =
+          await API.get(
+            "/meetings"
+          );
+
+        const courseRes =
+          await API.get(
+            "/courses"
+          );
+
+        setMeetings(
+          meetingRes.data
+        );
+
+        setCourses(
+          courseRes.data
+        );
+
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
   useEffect(() => {
     fetchData();
   }, []);
 
+
+  // =====================================
   // CREATE / UPDATE
-  const handleSubmit = async () => {
-    try {
-      if (editId) {
+  // =====================================
+
+  const handleSubmit =
+    async () => {
+
+      try {
+
+        // FORMAT TIME
         const payload = {
+
           ...form,
 
           start_time:
@@ -75,6 +172,7 @@ export default function ManageMeeting() {
             ),
         };
 
+        // UPDATE
         if (editId) {
 
           await API.put(
@@ -82,92 +180,158 @@ export default function ManageMeeting() {
             payload
           );
 
+          alert(
+            "Meeting berhasil diupdate"
+          );
+
         } else {
 
+          // CREATE
           await API.post(
             "/meetings",
             payload
           );
+
+          alert(
+            "Meeting berhasil ditambahkan"
+          );
         }
 
-        alert("Meeting berhasil diupdate");
+        // RESET
+        setForm({
 
-      } else {
-        await API.post("/meetings", form);
+          course_id: "",
 
-        alert("Meeting berhasil ditambahkan");
+          title: "",
+
+          type: "attendance",
+
+          content: "",
+
+          start_time: "",
+
+          end_time: "",
+        });
+
+        setEditId(null);
+
+        fetchData();
+
+      } catch (err) {
+
+        alert(
+          err.response?.data?.message ||
+          "Terjadi kesalahan"
+        );
       }
+    };
+
+
+  // =====================================
+  // DELETE
+  // =====================================
+
+  const handleDelete =
+    async (id) => {
+
+      const confirmDelete =
+        window.confirm(
+          "Hapus meeting ini?"
+        );
+
+      if (!confirmDelete)
+        return;
+
+      try {
+
+        await API.delete(
+          `/meetings/${id}`
+        );
+
+        fetchData();
+
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+
+  // =====================================
+  // EDIT
+  // =====================================
+
+  const handleEdit =
+    (m) => {
 
       setForm({
-        course_id: "",
-        title: "",
-        type: "attendance",
-        content: "",
-        start_time: "",
-        end_time: "",
+
+        course_id:
+          m.course_id,
+
+        title:
+          m.title,
+
+        type:
+          m.type,
+
+        content:
+          m.content || "",
+
+        start_time:
+          formatDateTimeLocal(
+            m.start_time
+          ),
+
+        end_time:
+          formatDateTimeLocal(
+            m.end_time
+          ),
       });
 
-      setEditId(null);
+      setEditId(m.id);
 
-      fetchData();
+      // SCROLL TOP
+      window.scrollTo({
 
-    } catch (err) {
-      alert(
-        err.response?.data?.message ||
-          "Terjadi kesalahan"
-      );
-    }
-  };
+        top: 0,
 
-  // DELETE
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Hapus meeting ini?"
-    );
+        behavior: "smooth",
+      });
+    };
 
-    if (!confirmDelete) return;
 
-    await API.delete(`/meetings/${id}`);
+  // =====================================
+  // FILTER
+  // =====================================
 
-    fetchData();
-  };
+  const filteredMeetings =
+    selectedCourse
 
-  // EDIT
-  const handleEdit = (m) => {
-    setForm({
-      course_id: m.course_id,
-      title: m.title,
-      type: m.type,
-      content: m.content || "",
-      start_time: formatDateTimeLocal(
-        m.start_time
-      ),
-      end_time: formatDateTimeLocal(
-        m.end_time
-      ),
-    });
+      ? meetings.filter(
+          (m) =>
+            m.course_id ==
+            selectedCourse
+        )
 
-    setEditId(m.id);
+      : meetings;
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
 
-  // FILTER COURSE
-  const filteredMeetings = selectedCourse
-    ? meetings.filter(
-        (m) =>
-          m.course_id == selectedCourse
-      )
-    : meetings;
+  // =====================================
+  // RENDER
+  // =====================================
 
   return (
-    <div className="admin-container">
-      <h2>Kelola Pertemuan</h2>
 
-      {/* FORM */}
+    <div className="admin-container">
+
+      <h2>
+        Kelola Pertemuan
+      </h2>
+
+      {/* =========================
+          FORM
+      ========================= */}
+
       <div className="admin-form">
 
         {/* COURSE */}
@@ -175,16 +339,21 @@ export default function ManageMeeting() {
           value={form.course_id}
           onChange={(e) =>
             setForm({
+
               ...form,
-              course_id: e.target.value,
+
+              course_id:
+                e.target.value,
             })
           }
         >
+
           <option value="">
             Pilih Course
           </option>
 
           {courses.map((c) => (
+
             <option
               key={c.id}
               value={c.id}
@@ -194,28 +363,40 @@ export default function ManageMeeting() {
           ))}
         </select>
 
+
         {/* TITLE */}
         <input
           placeholder="Judul Pertemuan"
+
           value={form.title}
+
           onChange={(e) =>
             setForm({
+
               ...form,
-              title: e.target.value,
+
+              title:
+                e.target.value,
             })
           }
         />
 
+
         {/* TYPE */}
         <select
           value={form.type}
+
           onChange={(e) =>
             setForm({
+
               ...form,
-              type: e.target.value,
+
+              type:
+                e.target.value,
             })
           }
         >
+
           <option value="attendance">
             Presensi
           </option>
@@ -225,65 +406,95 @@ export default function ManageMeeting() {
           </option>
         </select>
 
+
         {/* CONTENT */}
         <input
           placeholder="Link Materi"
+
           value={form.content}
+
           onChange={(e) =>
             setForm({
+
               ...form,
-              content: e.target.value,
+
+              content:
+                e.target.value,
             })
           }
         />
+
 
         {/* START */}
         <input
           type="datetime-local"
+
           value={form.start_time}
+
           onChange={(e) =>
             setForm({
+
               ...form,
-              start_time: e.target.value,
+
+              start_time:
+                e.target.value,
             })
           }
         />
+
 
         {/* END */}
         <input
           type="datetime-local"
+
           value={form.end_time}
+
           onChange={(e) =>
             setForm({
+
               ...form,
-              end_time: e.target.value,
+
+              end_time:
+                e.target.value,
             })
           }
         />
 
+
         {/* BUTTON */}
-        <button onClick={handleSubmit}>
+        <button
+          onClick={handleSubmit}
+        >
           {editId
             ? "Update Meeting"
             : "Tambah Meeting"}
         </button>
+
       </div>
 
-      {/* FILTER */}
+
+      {/* =========================
+          FILTER
+      ========================= */}
+
       <div className="filter-section">
+
         <select
           value={selectedCourse}
+
           onChange={(e) =>
             setSelectedCourse(
               e.target.value
             )
           }
         >
+
           <option value="">
             Semua Course
           </option>
 
           {courses.map((c) => (
+
             <option
               key={c.id}
               value={c.id}
@@ -292,84 +503,131 @@ export default function ManageMeeting() {
             </option>
           ))}
         </select>
+
       </div>
 
-      {/* TABLE */}
+
+      {/* =========================
+          TABLE
+      ========================= */}
+
       <table className="admin-table">
+
         <thead>
+
           <tr>
+
             <th>ID</th>
+
             <th>Course</th>
+
             <th>Judul</th>
+
             <th>Tipe</th>
+
             <th>Mulai</th>
+
             <th>Selesai</th>
+
             <th>Aksi</th>
+
           </tr>
+
         </thead>
 
+
         <tbody>
-          {filteredMeetings.map((m) => {
-            const course =
-              courses.find(
-                (c) => c.id === m.course_id
+
+          {filteredMeetings.map(
+            (m) => {
+
+              const course =
+                courses.find(
+                  (c) =>
+                    c.id ===
+                    m.course_id
+                );
+
+              return (
+
+                <tr key={m.id}>
+
+                  <td>
+                    {m.id}
+                  </td>
+
+                  <td>
+                    {course?.name ||
+                      "Unknown"}
+                  </td>
+
+                  <td>
+                    {m.title}
+                  </td>
+
+                  <td>
+                    {m.type}
+                  </td>
+
+                  <td>
+                    {new Date(
+                      m.start_time
+                    ).toLocaleString(
+                      "id-ID",
+                      {
+                        timeZone:
+                          "Asia/Jakarta",
+                      }
+                    )}
+                  </td>
+
+                  <td>
+                    {new Date(
+                      m.end_time
+                    ).toLocaleString(
+                      "id-ID",
+                      {
+                        timeZone:
+                          "Asia/Jakarta",
+                      }
+                    )}
+                  </td>
+
+                  <td>
+
+                    <button
+                      className="edit-btn"
+
+                      onClick={() =>
+                        handleEdit(m)
+                      }
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className="delete-btn"
+
+                      onClick={() =>
+                        handleDelete(
+                          m.id
+                        )
+                      }
+                    >
+                      Delete
+                    </button>
+
+                  </td>
+
+                </tr>
               );
+            }
+          )}
 
-            return (
-              <tr key={m.id}>
-                <td>{m.id}</td>
-
-                <td>
-                  {course?.name ||
-                    "Unknown"}
-                </td>
-
-                <td>{m.title}</td>
-
-                <td>{m.type}</td>
-
-                <td>
-                  {new Date(
-                    m.start_time
-                  ).toLocaleString("id-ID", {
-                    timeZone:
-                      "Asia/Jakarta",
-                  })}
-                </td>
-
-                <td>
-                  {new Date(
-                    m.end_time
-                  ).toLocaleString("id-ID", {
-                    timeZone:
-                      "Asia/Jakarta",
-                  })}
-                </td>
-
-                <td>
-                  <button
-                    className="edit-btn"
-                    onClick={() =>
-                      handleEdit(m)
-                    }
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      handleDelete(m.id)
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
         </tbody>
+
       </table>
+
     </div>
   );
 }
