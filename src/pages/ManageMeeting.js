@@ -23,6 +23,33 @@ const formatLocalDateTime = (
     + ":00";
 };
 
+// =====================================
+// FORMAT DATETIME FOR INPUT
+// =====================================
+
+const formatDateTimeLocal = (
+  dateTime
+) => {
+
+  if (!dateTime) return "";
+
+  const date = new Date(dateTime);
+
+  // WIB offset
+  const offset =
+    date.getTimezoneOffset();
+
+  const localDate =
+    new Date(
+      date.getTime() -
+      offset * 60000
+    );
+
+  return localDate
+    .toISOString()
+    .slice(0, 16);
+};
+
 export default function ManageMeeting() {
 
   // =====================================
