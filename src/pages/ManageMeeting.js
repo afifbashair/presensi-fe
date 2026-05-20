@@ -7,49 +7,23 @@ import API from "../services/api";
 
 import "../styles/admin.css";
 
-
 // =====================================
-// FORMAT DATETIME FOR DATABASE
-// =====================================
-
-const formatLocalDateTime = (
-  dateTime
-) => {
-
-  if (!dateTime) return "";
-
-  return dateTime
-    .replace("T", " ")
-    + ":00";
-};
-
-// =====================================
-// FORMAT DATETIME FOR INPUT
+// FORMAT DATETIME
 // =====================================
 
-const formatDateTimeLocal = (
-  dateTime
-) => {
-
+const formatDateTimeLocal = (dateTime) => {
   if (!dateTime) return "";
 
   const date = new Date(dateTime);
 
-  // WIB offset
-  const offset =
-    date.getTimezoneOffset();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
 
-  const localDate =
-    new Date(
-      date.getTime() -
-      offset * 60000
-    );
-
-  return localDate
-    .toISOString()
-    .slice(0, 16);
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
-
 export default function ManageMeeting() {
 
   // =====================================
@@ -146,15 +120,8 @@ export default function ManageMeeting() {
 
           ...form,
 
-          start_time:
-            formatLocalDateTime(
-              form.start_time
-            ),
-
-          end_time:
-            formatLocalDateTime(
-              form.end_time
-            ),
+          start_time: form.start_time,
+          end_time: form.end_time,
         };
 
         // UPDATE
