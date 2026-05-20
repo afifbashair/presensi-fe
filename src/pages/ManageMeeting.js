@@ -249,6 +249,8 @@ export default function ManageMeeting() {
 
         behavior: "smooth",
       });
+      console.log(m.start_time);
+      console.log(m.end_time);
     };
 
 
