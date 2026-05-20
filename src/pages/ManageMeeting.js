@@ -18,52 +18,10 @@ const formatLocalDateTime = (
 
   if (!dateTime) return "";
 
-  const date =
-    new Date(dateTime);
-
-  const offset =
-    date.getTimezoneOffset();
-
-  const local =
-    new Date(
-      date.getTime() -
-      offset * 60000
-    );
-
-  return local
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  return dateTime
+    .replace("T", " ")
+    + ":00";
 };
-
-
-// =====================================
-// FORMAT FOR datetime-local INPUT
-// =====================================
-
-const formatDateTimeLocal = (
-  dateString
-) => {
-
-  if (!dateString) return "";
-
-  const date =
-    new Date(dateString);
-
-  const offset =
-    date.getTimezoneOffset();
-
-  const localDate =
-    new Date(
-      date.getTime() -
-      offset * 60000
-    );
-
-  return localDate
-    .toISOString()
-    .slice(0, 16);
-};
-
 
 export default function ManageMeeting() {
 
