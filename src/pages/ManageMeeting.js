@@ -11,11 +11,16 @@ import "../styles/admin.css";
 // FORMAT DATETIME
 // =====================================
 
-const formatDateTimeLocal = (dateTime) => {
+const formatDateTimeLocal = (
+  dateTime
+) => {
+
   if (!dateTime) return "";
 
-  return dateTime.slice(0, 16);
+  return dateTime
+    .slice(0, 16);
 };
+
 export default function ManageMeeting() {
 
   // =====================================
@@ -107,13 +112,16 @@ export default function ManageMeeting() {
 
       try {
 
-        // FORMAT TIME
         const payload = {
 
           ...form,
 
-          start_time: form.start_time,
-          end_time: form.end_time,
+          // TANPA KONVERSI UTC
+          start_time:
+            form.start_time,
+
+          end_time:
+            form.end_time,
         };
 
         // UPDATE
@@ -241,8 +249,6 @@ export default function ManageMeeting() {
 
         behavior: "smooth",
       });
-      console.log(m.start_time);
-      console.log(m.end_time);
     };
 
 
@@ -515,18 +521,23 @@ export default function ManageMeeting() {
                     {m.type}
                   </td>
 
+                  {/* TANPA KONVERSI TIMEZONE */}
                   <td>
-                    {m.start_time
-                      ?.replace("T", " ")
-                      ?.replace(".000Z", "")
-                      ?.slice(0, 16)}
+                    {formatDateTimeLocal(
+                      m.start_time
+                    ).replace(
+                      "T",
+                      " "
+                    )}
                   </td>
 
                   <td>
-                    {m.end_time
-                      ?.replace("T", " ")
-                      ?.replace(".000Z", "")
-                      ?.slice(0, 16)}
+                    {formatDateTimeLocal(
+                      m.end_time
+                    ).replace(
+                      "T",
+                      " "
+                    )}
                   </td>
 
                   <td>
