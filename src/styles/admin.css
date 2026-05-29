@@ -53,3 +53,51 @@
   padding: 5px 10px;
   cursor: pointer;
 }
+
+.history-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow:
+    0 2px 5px rgba(0,0,0,.08);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap: 15px;
+}
+
+.stat-card {
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  text-align: center;
+
+  box-shadow:
+    0 2px 5px rgba(0,0,0,.1);
+}
+
+.export-btn {
+  background: #198754;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.export-btn:hover {
+  opacity: 0.9;
+}

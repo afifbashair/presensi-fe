@@ -325,6 +325,21 @@ export default function AdminDashboard() {
 
           </div>
 
+          {/* REKAP */}
+          <div
+            className="menu-card"
+            onClick={() =>
+              navigate("/admin/attendance")
+            }
+          >
+            <h3>Rekap Presensi</h3>
+
+            <p>
+              Lihat peserta hadir dan
+              tidak hadir
+            </p>
+          </div>
+
 
           {/* =========================
               USER TABLE

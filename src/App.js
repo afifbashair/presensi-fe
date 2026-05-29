@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import ManageCourses from "./pages/ManageCourses";
 import NotificationsPage from "./pages/NotificationsPage";
 import ManageCampus from "./pages/ManageCampus";
+import AttendanceReport from "./pages/AttendanceReport";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -113,6 +114,14 @@ function App() {
           element={
             <PrivateRoute>
               <ManageCampus />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/attendance"
+          element={
+            <PrivateRoute>
+              <AttendanceReport />
             </PrivateRoute>
           }
         />
