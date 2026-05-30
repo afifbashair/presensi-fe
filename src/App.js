@@ -10,6 +10,7 @@ import ManageCourses from "./pages/ManageCourses";
 import NotificationsPage from "./pages/NotificationsPage";
 import ManageCampus from "./pages/ManageCampus";
 import AttendanceReport from "./pages/AttendanceReport";
+import ManageEnrollment from "./pages/ManageEnrollment";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -122,6 +123,15 @@ function App() {
           element={
             <PrivateRoute>
               <AttendanceReport />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin/enrollments"
+          element={
+            <PrivateRoute>
+              <ManageEnrollment />
             </PrivateRoute>
           }
         />

@@ -340,6 +340,16 @@ export default function AdminDashboard() {
             </p>
           </div>
 
+          <div
+            className="menu-card"
+            onClick={() =>
+              navigate("/admin/enrollments")
+            }
+          >
+            <h3>Kelola Peserta</h3>
+            <p>Tambah mahasiswa ke course</p>
+          </div>
+
 
           {/* =========================
               USER TABLE
